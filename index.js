@@ -1,5 +1,6 @@
 require('dotenv').config()
-const {rtm, openMpim, sendSuggestedUsersMessage, sendInvalidColumnMessage, sendColumnFullMessage, sendNotPlayersTurnMessage, sendPlayersTurnMessage, sendMessage, sendWonMessage, sendTieMessage} = require('./lib/utils/slack')
+const Promise = require('bluebird')
+const {rtm, openMpim, sendSuggestedUsersMessage, sendInvalidColumnMessage, sendColumnFullMessage, sendNotPlayersTurnMessage, sendPlayersTurnMessage, sendMessage, sendWonMessage, sendTieMessage, sendLetsPlayMessage} = require('./lib/utils/slack')
 const {getUserIds, getInvitedUserId, isInvitedUserValid} = require('./lib/utils/users')
 const Game = require('./lib/game')
 
@@ -111,6 +112,11 @@ bot.message(async (message) => {
       mpimChannel = await openMpim(token, [userId, invitedUserId])
       game = new Game(userId, invitedUserId)
       games[mpimChannel] = game
+
+      await Promise.all([
+        sendLetsPlayMessage(token, userId, invitedUserId),
+        sendLetsPlayMessage(token, invitedUserId, userId)
+      ])
     }
 
     await sendMessage(token, mpimChannel, game.printBoard())
