@@ -1,0 +1,20 @@
+{
+  "name": "connect-4-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "chai": "^3.5.0",
+    "dotenv": "^2.0.0",
+    "slack": "^8.1.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0"
+  },
+  "scripts": {
+    "test": "mocha libTest/"
+  },
+  "author": "",
+  "license": "ISC"
+}
