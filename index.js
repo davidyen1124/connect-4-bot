@@ -6,8 +6,10 @@ const Game = require('./lib/game')
 const token = process.env.SLACK_TOKEN
 const bot = rtm.client()
 
-let botName = ''
+let botName
+let botId
 let users
+const groups = {}
 const games = {}
 
 bot.started((payload) => {
@@ -16,7 +18,13 @@ bot.started((payload) => {
   }
 
   botName = payload.self.name
+  botId = payload.self.id
   users = payload.users
+
+  for (let i = 0; i < payload.groups.length; i++) {
+    const group = payload.groups[i]
+    groups[group.id] = group
+  }
 
   console.log('botName:', botName)
 })
@@ -46,7 +54,8 @@ bot.message(async (message) => {
     }
 
     if (!game.isPlayersMove(userId)) {
-      await sendNotPlayersTurnMessage(token, channel, userId, game.getCurrentPlayer().getId())
+      const currentPlayer = game.getCurrentPlayer()
+      await sendNotPlayersTurnMessage(token, channel, userId, currentPlayer.getId())
       return
     }
 
@@ -75,15 +84,31 @@ bot.message(async (message) => {
       return
     }
 
-    const invitedUserId = getInvitedUserId(text)
-    if (!invitedUserId || !isInvitedUserValid(invitedUserId, userIdList)) {
-      await sendSuggestedUsersMessage(token, channel, userIdList)
-      return
-    }
+    let mpimChannel
+    let game
+    if (channel in groups) {
+      mpimChannel = channel
 
-    const mpimChannel = await openMpim(token, [userId, invitedUserId])
-    const game = new Game(userId, invitedUserId)
-    games[mpimChannel] = game
+      const members = groups[channel].members
+      if (members.length !== 3) {
+        await sendSuggestedUsersMessage(token, channel, userIdList)
+        return
+      }
+      members.splice(members.indexOf(botId), 1)
+
+      game = new Game(members[0], members[1])
+      games[channel] = game
+    } else {
+      const invitedUserId = getInvitedUserId(text)
+      if (!invitedUserId || !isInvitedUserValid(invitedUserId, userIdList)) {
+        await sendSuggestedUsersMessage(token, channel, userIdList)
+        return
+      }
+
+      mpimChannel = await openMpim(token, [userId, invitedUserId])
+      game = new Game(userId, invitedUserId)
+      games[mpimChannel] = game
+    }
 
     await sendMessage(token, mpimChannel, game.printBoard())
     const currentPlayer = game.getCurrentPlayer()
