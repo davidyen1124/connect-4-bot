@@ -1,5 +1,5 @@
 require('dotenv').config()
-const {rtm, openMpim, sendSuggestedUsersMessage, sendInvalidColumnMessage, sendColumnFullMessage, sendNotPlayersTurnMessage, sendPlayersTurnMessage, sendMessage, sendWonMessage} = require('./lib/utils/slack')
+const {rtm, openMpim, sendSuggestedUsersMessage, sendInvalidColumnMessage, sendColumnFullMessage, sendNotPlayersTurnMessage, sendPlayersTurnMessage, sendMessage, sendWonMessage, sendTieMessage} = require('./lib/utils/slack')
 const {getUserIds, getInvitedUserId, isInvitedUserValid} = require('./lib/utils/users')
 const Game = require('./lib/game')
 
@@ -75,6 +75,9 @@ bot.message(async (message) => {
     if (game.hasWinner()) {
       await sendWonMessage(token, channel, userId)
       delete games[channel]
+    } else if (game.isTie()) {
+      delete games[channel]
+      await sendTieMessage(token, channel)
     } else {
       const currentPlayer = game.getCurrentPlayer()
       await sendPlayersTurnMessage(token, channel, currentPlayer.getEmoji(), currentPlayer.getId())

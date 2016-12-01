@@ -210,4 +210,21 @@ describe('Game', () => {
       expect(game.hasWinner()).to.be.true
     })
   })
+
+  describe('check tie', () => {
+    it('on nonfull board', () => {
+      game.makeMove(0, YELLOW)
+      expect(game.isTie()).to.be.false
+    })
+
+    it('on full board', () => {
+      for (let i = 0; i < HEIGHT; i++) {
+        for (let j = 0; j < WIDTH; j++) {
+          game.makeMove(j, (j + i) % 2 ? YELLOW : BLACK)
+        }
+      }
+
+      expect(game.isTie()).to.be.true
+    })
+  })
 })
