@@ -40,11 +40,10 @@ bot.message(async (message) => {
       return
     }
 
-    let column = parseInt(text)
+    let column = parseInt(text) - 1
     if (isNaN(column)) {
       return
     }
-    column--
 
     if (!game.isPlayersMove(userId)) {
       await sendNotPlayersTurnMessage(token, channel, userId, game.getCurrentPlayer().getId())
@@ -72,6 +71,10 @@ bot.message(async (message) => {
       await sendPlayersTurnMessage(token, channel, currentPlayer.getEmoji(), currentPlayer.getId())
     }
   } else {
+    if (!/play.*/i.test(text)) {
+      return
+    }
+
     const invitedUserId = getInvitedUserId(text)
     if (!invitedUserId || !isInvitedUserValid(invitedUserId, userIdList)) {
       await sendSuggestedUsersMessage(token, channel, userIdList)
