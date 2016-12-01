@@ -29,3 +29,8 @@ Use powerful `async/await` in Node v7.
 ```
 node --harmony-async-await index.js
 ```
+
+##How to play:
+
+* Message your bot by typing `play @<another user id>`.
+* Typing 'play' in a multiparty DM.
