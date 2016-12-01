@@ -41,6 +41,10 @@ bot.message(async (message) => {
     }
 
     let column = parseInt(text)
+    if (isNaN(column)) {
+      return
+    }
+    column--
 
     if (!game.isPlayersMove(userId)) {
       await sendNotPlayersTurnMessage(token, channel, userId, game.getCurrentPlayer().getId())
@@ -51,7 +55,6 @@ bot.message(async (message) => {
       await sendInvalidColumnMessage(token, channel, userId)
       return
     }
-    column--
 
     if (game.isColumnFull(column)) {
       await sendColumnFullMessage(token, channel, userId, column)
