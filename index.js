@@ -33,7 +33,7 @@ bot.message(async (message) => {
   if (channel in games) {
     const game = games[channel]
 
-    if (text === 'show') {
+    if (/show.*/i.test(text)) {
       await sendMessage(token, channel, game.printBoard())
       const currentPlayer = game.getCurrentPlayer()
       await sendPlayersTurnMessage(token, channel, currentPlayer.getEmoji(), currentPlayer.getId())
